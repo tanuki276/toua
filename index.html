@@ -3,131 +3,148 @@
 <head>
   <meta charset="UTF-8" />
   <title>お問い合わせフォーム</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      background-color: #f2f4f8;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 2rem;
+      font-family: sans-serif;
+      background: #121212;
+      color: #eee;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
+      font-size: 20px;
     }
-
-    .form-container {
-      background: white;
+    form {
+      background: #1e1e1e;
       padding: 3rem;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 500px;
+      border-radius: 20px;
+      width: 400px;
+      box-shadow: 0 0 20px #0f62fe;
+      display: block;
     }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 2rem;
+    h2 {
       font-size: 2rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
     }
-
     label {
       display: block;
-      margin: 1rem 0 0.5rem;
+      margin-top: 1.5rem;
       font-size: 1.2rem;
     }
-
     input, textarea {
       width: 100%;
       padding: 1rem;
-      font-size: 1.1rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      margin-top: 0.5rem;
+      border-radius: 10px;
+      border: none;
+      font-size: 1.2rem;
+      background: #333;
+      color: #eee;
+      resize: vertical;
+      box-sizing: border-box;
     }
-
-    button {
+    button[type="submit"] {
       margin-top: 2rem;
       width: 100%;
       padding: 1rem;
-      font-size: 1.2rem;
-      background-color: #0f62fe;
-      color: white;
       border: none;
       border-radius: 10px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #0047ba;
-    }
-
-    .error {
-      color: red;
-      margin-top: 0.5rem;
-      font-size: 0.95rem;
-    }
-
-    .success {
-      text-align: center;
-      color: green;
+      background-color: #0f62fe;
+      color: white;
+      font-size: 1.2rem;
       font-weight: bold;
-      margin-top: 2rem;
+      cursor: pointer;
+      box-shadow: 0 0 10px #0f62fe;
+      transition: background-color 0.3s;
+    }
+    button[type="submit"]:hover:not(:disabled) {
+      background-color: #0956c3;
+    }
+    button:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .message {
+      margin-top: 1.5rem;
+      font-size: 1.1rem;
+      min-height: 1.4em;
+      color: lightgreen;
     }
   </style>
 </head>
 <body>
-  <div class="form-container">
-    <h1>お問い合わせ</h1>
-    <form id="contactForm">
-      <label for="message">メッセージ</label>
-      <textarea id="message" rows="5" required></textarea>
-      <div class="error" id="msgError"></div>
-
-      <label for="email">メールアドレス（任意）</label>
-      <input type="email" id="email" placeholder="example@example.com" />
-      <div class="error" id="emailError"></div>
-
-      <button type="submit">送信</button>
-      <div class="success" id="successMsg"></div>
-    </form>
-  </div>
-
+  <form id="contactForm" novalidate>
+    <h2>お問い合わせフォーム</h2>
+    <label for="name">名前（任意）</label>
+    <input type="text" id="name" name="name" maxlength="50" autocomplete="off" />
+    <label for="email">メールアドレス（任意）</label>
+    <input type="email" id="email" name="email" maxlength="100" autocomplete="off" />
+    <label for="message">メッセージ（必須・100文字以内）</label>
+    <textarea id="message" name="message" rows="4" maxlength="100" required></textarea>
+    <button type="submit">送信</button>
+    <div class="message" id="responseMessage"></div>
+  </form>
   <script>
-    const form = document.getElementById("contactForm");
-    const msgError = document.getElementById("msgError");
-    const emailError = document.getElementById("emailError");
-    const successMsg = document.getElementById("successMsg");
+    const form = document.getElementById('contactForm');
+    const responseMessage = document.getElementById('responseMessage');
 
-    form.addEventListener("submit", async (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      msgError.textContent = "";
-      emailError.textContent = "";
-      successMsg.textContent = "";
 
-      const message = document.getElementById("message").value.trim();
-      const email = document.getElementById("email").value.trim();
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const message = form.message.value.trim();
 
-      if (!message || message.length > 100 || message.includes("http")) {
-        msgError.textContent = "100文字以内・URL禁止のメッセージを入力してください。";
+      const urlPattern = /(https?:\/\/)/i;
+      if (urlPattern.test(name) || urlPattern.test(email) || urlPattern.test(message)) {
+        responseMessage.style.color = 'salmon';
+        responseMessage.textContent = 'URLの入力は禁止されています。';
+        return;
+      }
+
+      if (!message) {
+        responseMessage.style.color = 'salmon';
+        responseMessage.textContent = 'メッセージは必須です。';
+        return;
+      }
+      if (message.length > 100) {
+        responseMessage.style.color = 'salmon';
+        responseMessage.textContent = 'メッセージは100文字以内で入力してください。';
         return;
       }
 
       if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        emailError.textContent = "正しいメールアドレス形式で入力してください。";
+        responseMessage.style.color = 'salmon';
+        responseMessage.textContent = '正しいメールアドレスを入力してください。';
         return;
       }
 
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, email })
-      });
+      responseMessage.style.color = 'lightgreen';
+      responseMessage.textContent = '送信中…';
 
-      if (res.ok) {
-        successMsg.textContent = "送信されました。ありがとう！";
-        form.reset();
-      } else {
-        successMsg.textContent = "送信に失敗しました。";
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, message }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          responseMessage.style.color = 'lightgreen';
+          responseMessage.textContent = '送信が完了しました。ありがとうございます！';
+          form.reset();
+        } else {
+          responseMessage.style.color = 'salmon';
+          responseMessage.textContent = data.error || '送信に失敗しました。';
+        }
+      } catch (error) {
+        responseMessage.style.color = 'salmon';
+        responseMessage.textContent = '通信エラーが発生しました。';
       }
     });
   </script>
