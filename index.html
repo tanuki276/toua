@@ -3,200 +3,131 @@
 <head>
   <meta charset="UTF-8" />
   <title>お問い合わせフォーム</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
-
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%);
-      color: #eee;
+      background-color: #f2f4f8;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 2rem;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      margin: 0;
     }
-    form {
-      background: linear-gradient(145deg, #22252a, #1a1c20);
-      padding: 2rem;
-      border-radius: 12px;
-      width: 340px;
-      box-shadow: 0 0 15px rgba(15, 98, 254, 0.8);
-      box-sizing: border-box;
+
+    .form-container {
+      background: white;
+      padding: 3rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 500px;
     }
-    h2 {
+
+    h1 {
       text-align: center;
-      margin-bottom: 1rem;
-      font-weight: 700;
-      letter-spacing: 1px;
+      margin-bottom: 2rem;
+      font-size: 2rem;
     }
+
     label {
       display: block;
-      margin-top: 1rem;
-      font-weight: 600;
-      user-select: none;
+      margin: 1rem 0 0.5rem;
+      font-size: 1.2rem;
     }
+
     input, textarea {
       width: 100%;
-      padding: 0.6rem 0.8rem;
-      margin-top: 0.3rem;
-      border-radius: 8px;
-      border: none;
-      font-size: 1rem;
-      background: #33373e;
-      color: #eee;
-      transition: background-color 0.3s ease;
-      box-sizing: border-box;
-    }
-    input:focus, textarea:focus {
-      outline: none;
-      background: #3a3f47;
-      box-shadow: 0 0 8px #0f62fe;
-    }
-    button {
-      margin-top: 1.8rem;
-      width: 100%;
-      padding: 0.75rem;
-      border: none;
-      border-radius: 8px;
-      background: linear-gradient(90deg, #0f62fe, #0043ce);
-      color: white;
-      font-weight: 700;
+      padding: 1rem;
       font-size: 1.1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      margin-top: 2rem;
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.2rem;
+      background-color: #0f62fe;
+      color: white;
+      border: none;
+      border-radius: 10px;
       cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.6rem;
-      user-select: none;
-      transition: background 0.3s ease;
-      box-sizing: border-box;
     }
-    button:disabled {
-      background: #555;
-      cursor: not-allowed;
-      box-shadow: none;
+
+    button:hover {
+      background-color: #0047ba;
     }
-    .message {
-      margin-top: 1rem;
+
+    .error {
+      color: red;
+      margin-top: 0.5rem;
       font-size: 0.95rem;
-      min-height: 1.4em;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      opacity: 0;
-      animation: fadeIn 0.6s forwards;
-      user-select: none;
     }
-    .message.success {
-      color: #a3e635;
-    }
-    .message.error {
-      color: #f87171;
-    }
-    .spinner {
-      border: 3px solid #ddd;
-      border-top: 3px solid #0f62fe;
-      border-radius: 50%;
-      width: 18px;
-      height: 18px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    @keyframes fadeIn {
-      to { opacity: 1; }
+
+    .success {
+      text-align: center;
+      color: green;
+      font-weight: bold;
+      margin-top: 2rem;
     }
   </style>
 </head>
 <body>
-  <form id="contactForm" novalidate>
-    <h2>お問い合わせフォーム</h2>
-    <label for="name">名前（任意）</label>
-    <input type="text" id="name" name="name" maxlength="50" autocomplete="off" />
+  <div class="form-container">
+    <h1>お問い合わせ</h1>
+    <form id="contactForm">
+      <label for="message">メッセージ</label>
+      <textarea id="message" rows="5" required></textarea>
+      <div class="error" id="msgError"></div>
 
-    <label for="email">メールアドレス（任意）</label>
-    <input type="email" id="email" name="email" maxlength="100" autocomplete="off" />
+      <label for="email">メールアドレス（任意）</label>
+      <input type="email" id="email" placeholder="example@example.com" />
+      <div class="error" id="emailError"></div>
 
-    <label for="message">メッセージ（必須・100文字以内）</label>
-    <textarea id="message" name="message" rows="4" maxlength="100" required></textarea>
-
-    <button type="submit" id="submitBtn"><i class="fas fa-paper-plane"></i> 送信</button>
-    <div class="message" id="responseMessage"></div>
-  </form>
+      <button type="submit">送信</button>
+      <div class="success" id="successMsg"></div>
+    </form>
+  </div>
 
   <script>
-    const form = document.getElementById('contactForm');
-    const responseMessage = document.getElementById('responseMessage');
-    const submitBtn = document.getElementById('submitBtn');
+    const form = document.getElementById("contactForm");
+    const msgError = document.getElementById("msgError");
+    const emailError = document.getElementById("emailError");
+    const successMsg = document.getElementById("successMsg");
 
-    function showMessage(text, type = 'success') {
-      responseMessage.textContent = '';
-      responseMessage.className = `message ${type}`;
-
-      const icon = document.createElement('i');
-      if(type === 'success') {
-        icon.className = 'fas fa-check-circle';
-      } else if(type === 'error') {
-        icon.className = 'fas fa-exclamation-circle';
-      } else if(type === 'loading') {
-        icon.className = 'spinner';
-      }
-      responseMessage.appendChild(icon);
-      responseMessage.appendChild(document.createTextNode(text));
-    }
-
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      submitBtn.disabled = true;
-      showMessage('送信中…', 'loading');
+      msgError.textContent = "";
+      emailError.textContent = "";
+      successMsg.textContent = "";
 
-      const name = form.name.value.trim();
-      const email = form.email.value.trim();
-      const message = form.message.value.trim();
+      const message = document.getElementById("message").value.trim();
+      const email = document.getElementById("email").value.trim();
 
-      const urlPattern = /(https?:\/\/)/i;
-      if (urlPattern.test(name) || urlPattern.test(email) || urlPattern.test(message)) {
-        showMessage('URLの入力は禁止されています。', 'error');
-        submitBtn.disabled = false;
+      if (!message || message.length > 100 || message.includes("http")) {
+        msgError.textContent = "100文字以内・URL禁止のメッセージを入力してください。";
         return;
       }
-      if (!message) {
-        showMessage('メッセージは必須です。', 'error');
-        submitBtn.disabled = false;
-        return;
-      }
-      if (message.length > 100) {
-        showMessage('メッセージは100文字以内で入力してください。', 'error');
-        submitBtn.disabled = false;
-        return;
-      }
+
       if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        showMessage('正しいメールアドレスを入力してください。', 'error');
-        submitBtn.disabled = false;
+        emailError.textContent = "正しいメールアドレス形式で入力してください。";
         return;
       }
 
-      try {
-        const res = await fetch('/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, message }),
-        });
-        const data = await res.json();
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message, email })
+      });
 
-        if (res.ok) {
-          showMessage('送信が完了しました。ありがとうございます！', 'success');
-          form.reset();
-        } else {
-          showMessage(data.error || '送信に失敗しました。', 'error');
-        }
-      } catch {
-        showMessage('通信エラーが発生しました。', 'error');
-      } finally {
-        submitBtn.disabled = false;
+      if (res.ok) {
+        successMsg.textContent = "送信されました。ありがとう！";
+        form.reset();
+      } else {
+        successMsg.textContent = "送信に失敗しました。";
       }
     });
   </script>
